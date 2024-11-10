@@ -29,7 +29,9 @@ export default function Chat() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim() || isLoading) return
-
+    const defaultPrompt = "Give me a short response. "
+    const finalInput = defaultPrompt + input;
+    console.log(finalInput)
     setIsLoading(true)
     setMessages(prev => [...prev, { role: 'user', content: input }])
 
@@ -39,7 +41,7 @@ export default function Chat() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ message: finalInput }),
       })
 
       if (!response.ok) {
@@ -77,12 +79,12 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
-      <div className="flex-1 flex-col overflow-y-auto p-4">
-        <div className="flex flex-col max-w-3xl mx-auto space-y-6">
+    <div className="flex flex-col flex-1 h-full bg-gray-50">
+      <div className="flex-1 overflow-y-auto">
+        <div className="flex flex-col p-4 space-y-4">
           {messages.length === 0 ? (
-            <div className="flex justify-center items-center h-32">
-              <p className="text-2xl text-gray-500 font-light">How can I help you today?</p>
+            <div className="flex-1 flex justify-center items-center">
+              <p className="text-xl text-gray-500 font-light">How can Whack help you today?</p>
             </div>
           ) : (
             messages.map((message, index) => (
@@ -90,22 +92,37 @@ export default function Chat() {
                 key={index}
                 className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <div
-                  className={`max-w-[80%] px-4 py-2 rounded-2xl ${
-                    message.role === 'user'
-                      ? 'bg-blue-500 text-white rounded-br-none'
-                      : 'bg-white shadow-sm border rounded-bl-none'
-                  }`}
-                >
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                <div className="flex items-end space-x-2 max-w-[80%]">
+                  {message.role === 'bot' && (
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                      <span className="text-blue-600 text-sm font-medium">W</span>
+                    </div>
+                  )}
+                  <div
+                    className={`px-4 py-2 rounded-2xl ${
+                      message.role === 'user'
+                        ? 'bg-blue-500 text-white rounded-br-none'
+                        : 'bg-white shadow-sm border rounded-bl-none'
+                    }`}
+                  >
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  </div>
+                  {message.role === 'user' && (
+                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-sm font-medium">U</span>
+                    </div>
+                  )}
                 </div>
               </div>
             ))
           )}
           <div ref={messagesEndRef} />
           {isLoading && (
-            <div className="flex justify-start">
-              <div className="bg-gray-200 rounded-full px-4 py-2">
+            <div className="flex items-end space-x-2">
+              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                <span className="text-blue-600 text-sm font-medium">C</span>
+              </div>
+              <div className="bg-white shadow-sm border rounded-2xl rounded-bl-none px-4 py-2">
                 <div className="flex space-x-2">
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100" />
@@ -118,29 +135,26 @@ export default function Chat() {
       </div>
 
       <div className="border-t bg-white p-4">
-        <div className="max-w-3xl mx-auto">
-          <form onSubmit={handleSubmit} className="flex items-end space-x-2">
-            <div className="flex-1">
-              <textarea
-                ref={textareaRef}
-                className="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                placeholder="Type your message..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                disabled={isLoading}
-                rows={1}
-              />
-            </div>
-            <button
-              type="submit"
+        <form onSubmit={handleSubmit} className="flex items-end space-x-2">
+          <div className="flex-1">
+            <textarea
+              ref={textareaRef}
+              className="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              placeholder="Message Whack..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
               disabled={isLoading}
-              className="rounded-full p-3 text-blue-500 hover:bg-blue-50 disabled:opacity-50 disabled:hover:bg-transparent"
-            >
-              <Send className="h-5 w-5" />
-              {/* <span className="sr-only">Send message</span> */}
-            </button>
-          </form>
-        </div>
+              rows={1}
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={isLoading || !input.trim()}
+            className="rounded-full p-3 text-blue-500 hover:bg-blue-50 disabled:opacity-50 disabled:hover:bg-transparent"
+          >
+            <Send className="h-5 w-5" />
+          </button>
+        </form>
       </div>
     </div>
   )

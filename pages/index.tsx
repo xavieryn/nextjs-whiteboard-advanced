@@ -5,11 +5,11 @@ import Chat from "../src/components/Chat";
 export default function Home() {
   return (
     <main className="flex h-screen w-full">
-    <div className="w-3/4">
+    <div className="flex w-3/4">
       <Whiteboard />
     </div>
-    <div className="w-1/4">
-      <div > <Chat/></div>
+    <div className="flex w-1/4">
+      <Chat/>
     </div>
   </main>
   );
